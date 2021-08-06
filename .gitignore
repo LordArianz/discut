@@ -198,9 +198,9 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,virtualenv
 
-code/contextual_embeddings/data_converted/
-code/contextual_embeddings/Results_conll/
-code/contextual_embeddings/Results_conllu/
-code/contextual_embeddings/Results_split.tok/
-code/contextual_embeddings/Results_tok/
-data/
+data_converted/*
+Results_conll/*
+Results_conllu/*
+Results_split.tok/*
+Results_tok/*
+data/*

@@ -26,7 +26,6 @@ if __name__ == '__main__':
     # locate corpus files
     corpus = args.corpus
     corpus_dir = os.path.join(DATA_DIR, corpus)
-    print(corpus_dir)
     if not os.path.isdir(corpus_dir):
         raise ValueError("Incorrect path to corpus: {}".format(corpus_dir))
     sections = (('train', 'dev', 'test') if args.section == 'all'
@@ -36,7 +35,7 @@ if __name__ == '__main__':
         if not os.path.exists(fp_tok):
             raise ValueError("Incorrect path to corpus file: {}".format(fp_tok))
     # TODO create folder for parses by date or version (+ store parser parameters)
-    out_dir = os.path.join(args.out_dir, args.processing)
+    out_dir = args.out_dir # os.path.join(args.out_dir, args.processing)
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     # setup and call each parser in turn

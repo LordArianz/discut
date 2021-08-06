@@ -4,16 +4,14 @@ from tok_format import tok_tokens_labels
 from conll_format import begin_toks_sents
 from task_data import rebuild_text
 from stanza.utils.conll import CoNLL
+from tqdm import tqdm
 
-RES_DIR = 'C:\\Users\\pc\\stanza_resources'
 
 def ssplit_stanza(lang, fp_toks, out_dir, treebank=None):
-    
-    if not os.path.exists(os.path.join(RES_DIR, lang)):
-        if treebank is not None:
-            stanza.download(lang, package=treebank)
-        else:
-           stanza.download(lang) 
+    if treebank is not None:
+        stanza.download(lang, package=treebank)
+    else:
+        stanza.download(lang) 
     processors = 'tokenize'
     nlp = stanza.Pipeline(lang, processors=processors, use_gpu=True)
 
@@ -31,7 +29,7 @@ def ssplit_stanza(lang, fp_toks, out_dir, treebank=None):
         fp_out = fp_out.replace('.tok', '.split.tok')
         with open(fp_out, mode='w', encoding='utf-8') as f_out:
             # parse each doc in turn
-            for (doc_id, doc_toks, doc_lbls), (_, doc_chars, tok_begs) in zip(tok_tok_lbls, tok_tok_begs):
+            for (doc_id, doc_toks, doc_lbls), (_, doc_chars, tok_begs) in tqdm(zip(tok_tok_lbls, tok_tok_begs), total=min(len(tok_tok_lbls), len(tok_tok_begs))):
                 doc_text = rebuild_text(doc_toks, lang=lang)
                 # print(doc_text)
                 ann = nlp(doc_text)
