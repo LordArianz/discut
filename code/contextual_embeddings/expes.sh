@@ -19,7 +19,7 @@ if [ -z "$5" ];
 then
     export HAS_PAR=false
     export TOOLONG=false
-elif [ "${5}" = "-s" ];
+elif [ "${5}" = "--s" ];
 then
     export TOOLONG=true
     export SPLIT=${6}
@@ -29,7 +29,7 @@ else
     export PARENT=${5}
 fi
 
-if [ $# -eq 7 ] && [ "${6}" = "-s" ]; 
+if [ $# -eq 7 ] && [ "${6}" = "--s" ]; 
 then
     export TOOLONG=true
     export SPLIT=${7}
@@ -61,26 +61,21 @@ export GOLD=${GOLD_BASE}${DATASET}"/"${DATASET}"_"${EVAL}"."${CONFIG}
 
 mkdir -p ${CONV}
 
-# conversion of datasets to NER / BIO format by first testing the existence of files so as not to redo it each time
-if [ ! -f ${CONV}${DATASET}"_train.ner."${CONFIG} ]; then
-    echo "converting to ner format -> in data_converted ..."
-    if [ $TOOLONG = true ];
-    then 
-        python ${CODE}conv2ner.py "data/"${DATASET}"/"${DATASET}"_train."${CONFIG}  ${CONV}/${DATASET}"_train.ner."${CONFIG} --split-too-long True ${SPLIT}
-    else
-        python ${CODE}conv2ner.py "data/"${DATASET}"/"${DATASET}"_train."${CONFIG}  ${CONV}/${DATASET}"_train.ner."${CONFIG} 
+for val in "train" ${EVAL}; do
+    export original=${GOLD_BASE}"/"${DATASET}"/"${DATASET}"_"${val}"."${CONFIG}
+    export converted=${CONV}/${DATASET}"_"${val}".ner."${CONFIG}
+    # conversion of datasets to NER / BIO format by first testing the existence of files so as not to redo it each time
+    if [ ! -f ${converted} ]; then
+        echo "converting "${val}" to ner format -> in data_converted ..."
+        if [ $TOOLONG = true ];
+        then 
+            python ${CODE}conv2ner.py ${original} ${converted} --split-too-long True ${SPLIT}
+        else
+            python ${CODE}conv2ner.py ${original} ${converted}
+        fi
     fi
-fi
 
-if [ ! -f ${CONV}/${DATASET}"_"${EVAL}".ner."${CONFIG} ]; then
-    echo "converting to ner format -> in data_converted ..."
-    if [ $TOOLONG = true ];
-    then 
-        python ${CODE}conv2ner.py "data/"${DATASET}"/"${DATASET}"_"${EVAL}"."${CONFIG}  ${CONV}/${DATASET}"_"${EVAL}".ner."${CONFIG} --split-too-long True ${SPLIT}
-    else
-        python ${CODE}conv2ner.py "data/"${DATASET}"/"${DATASET}"_"${EVAL}"."${CONFIG}  ${CONV}/${DATASET}"_"${EVAL}".ner."${CONFIG} 
-    fi
-fi
+done
 
 if [ "$ACTION" = "train" ]; 
 then
@@ -88,7 +83,7 @@ then
     then
         echo "fine tune"
         # fine tune
-        allennlp fine-tune -m Results_${CONFIG}/results_${PARENT}_${MODEL}/model.tar.gz -c ${CODE}configs/bert.jsonnet -s Results_${CONFIG}/results_${OUTPUT}
+        allennlp fine-tune -m Results_${CONFIG}/results_${PARENT}_${MODEL}/model.tar.gz -c ${CODE}configs/bert.jsonnet -s Results_${CONFIG}/results_${DATASET}-${PARENT}_${MODEL}
     else
         echo "train"
         # train with config in bert.jsonnet; the config references explicitely variables TRAIN_DATA_PATH and TEST_A_PATH
@@ -96,9 +91,15 @@ then
     fi
 elif [ $HAS_PAR = true ];
 then
-    echo "parent test"
-    export TRAIN_DATA_PATH=${CONV}${PARENT}"_train.ner."${CONFIG}
-    export OUTPUT=${PARENT}"_"${MODEL}
+    if [ "$ACTION" = "test" ];
+    then
+        echo "parent test"
+        export TRAIN_DATA_PATH=${CONV}${PARENT}"_train.ner."${CONFIG}
+        export OUTPUT=${PARENT}"_"${MODEL}
+    else
+        echo "finetune test"
+        export OUTPUT=${DATASET}"-"${PARENT}"_"${MODEL}
+    fi
 fi
 
 # predict with model -> outputs json

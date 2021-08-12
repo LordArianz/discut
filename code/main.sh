@@ -1,109 +1,50 @@
-if [ $# -eq 3 ]; 
-then
-    echo "data=$1, config=$2, action=$3"
-else
-    echo "Preprocessing..."
-fi
+export CONFIG=${1}
 
-export DATASET=${1}
-export CONFIG=${2}
-export ACTION=${3}
+datasets=("deu.rst.pcc" "eng.rst.gum" "eng.rst.rstdt" "eng.sdrt.stac" "eus.rst.ert" "fas.rst.prstc" "fra.sdrt.annodis" "nld.rst.nldt" "por.rst.cstn" "rus.rst.rrt" "spa.rst.rststb" "spa.rst.sctb" "zho.rst.sctb" "eng.pdtb.pdtb" "tur.pdtb.tdb" "zho.pdtb.cdtb")
+groups=("eng.rst.gum","eng.rst.rstdt","eng_rst" "eng_rst","eng.sdrt.stac","eng" "deu.rst.pcc","nld.rst.nldt","deu_nld" "deu_nld","eng","ger" "spa.rst.rststb","spa.rst.sctb","spa" "spa","por.rst.cstn","spo")
 
-
-if [ "$DATASET" = "preprocess" ]; then
-    echo "splitting deu.rst.pcc begins..."
-    python code/ssplit/parse_corpus.py deu.rst.pcc --parser stanza --out_dir data
-    echo "splitting deu.rst.pcc is done"
-    echo "splitting eng.rst.gum begins..."
-    python code/ssplit/parse_corpus.py eng.rst.gum --parser stanza --out_dir data
-    echo "splitting eng.rst.gum is done"
-    echo "splitting eng.rst.rstdt begins..."
-    python code/ssplit/parse_corpus.py eng.rst.rstdt --parser stanza --out_dir data
-    echo "splitting eng.rst.rstdt is done"
-    echo "splitting eng.sdrt.stac begins..."
-    python code/ssplit/parse_corpus.py eng.sdrt.stac --parser stanza --out_dir data
-    echo "splitting eng.sdrt.stac is done"
-    echo "splitting eus.rst.ert begins..."
-    python code/ssplit/parse_corpus.py eus.rst.ert --parser stanza --out_dir data
-    echo "splitting eus.rst.ert is done"
-    echo "splitting fas.rst.prstc begins..."
-    python code/ssplit/parse_corpus.py fas.rst.prstc --parser stanza --out_dir data
-    echo "splitting fas.rst.prstc is done"
-    echo "splitting fra.sdrt.annodis begins..."
-    python code/ssplit/parse_corpus.py fra.sdrt.annodis --parser stanza --out_dir data
-    echo "splitting fra.sdrt.annodis is done"
-    echo "splitting nld.rst.nldt begins..."
-    python code/ssplit/parse_corpus.py nld.rst.nldt --parser stanza --out_dir data
-    echo "splitting nld.rst.nldt is done"
-    echo "splitting por.rst.cstn begins..."
-    python code/ssplit/parse_corpus.py por.rst.cstn --parser stanza --out_dir data
-    echo "splitting por.rst.cstn is done"
-    echo "splitting rus.rst.rrt begins..."
-    python code/ssplit/parse_corpus.py rus.rst.rrt --parser stanza --out_dir data
-    echo "splitting rus.rst.rrt is done"
-    echo "splitting spa.rst.rststb begins..."
-    python code/ssplit/parse_corpus.py spa.rst.rststb --parser stanza --out_dir data
-    echo "splitting spa.rst.rststb is done"
-    echo "splitting spa.rst.sctb begins..."
-    python code/ssplit/parse_corpus.py spa.rst.sctb --parser stanza --out_dir data
-    echo "splitting spa.rst.sctb is done"
-    echo "splitting zho.rst.sctb begins..."
-    python code/ssplit/parse_corpus.py zho.rst.sctb --parser stanza --out_dir data
-    echo "splitting zho.rst.sctb is done"
-    echo "splitting eng.pdtb.pdtb begins..."
-    python code/ssplit/parse_corpus.py eng.pdtb.pdtb --parser stanza --out_dir data
-    echo "splitting eng.pdtb.pdtb is done"
-    echo "splitting tur.pdtb.tdb begins..."
-    python code/ssplit/parse_corpus.py tur.pdtb.tdb --parser stanza --out_dir data
-    echo "splitting tur.pdtb.tdb is done"
-    echo "splitting zho.pdtb.cdtb begins..."
-    python code/ssplit/parse_corpus.py zho.pdtb.cdtb --parser stanza --out_dir data
-    echo "splitting zho.pdtb.cdtb is done"
-    echo "merging eng.rst.gum and eng.rst.rstdt begins..."
-    bash code/contextual_embeddings/merger.sh eng.rst.gum eng.rst.rstdt eng_rst
-    echo "merging eng.rst.gum and eng.rst.rstdt is done"
-    echo "merging eng_rst and eng.sdrt.stac begins..."
-    bash code/contextual_embeddings/merger.sh eng_rst eng.sdrt.stac eng
-    echo "merging eng_rst and eng.sdrt.stac is done"
-    echo "merging deu.rst.pcc and nld.rst.nldt begins..."
-    bash code/contextual_embeddings/merger.sh deu.rst.pcc nld.rst.nldt deu_nld
-    echo "merging deu.rst.pcc and nld.rst.nldt is done"
-    echo "merging deu_nld and eng begins..."
-    bash code/contextual_embeddings/merger.sh deu_nld eng ger
-    echo "merging deu_nld and eng is done"
-    echo "merging spa.rst.rststb and spa.rst.sctb begins..."
-    bash code/contextual_embeddings/merger.sh spa.rst.rststb spa.rst.sctb spa
-    echo "merging spa.rst.rststb and spa.rst.sctb is done"
-    echo "merging spa and por.rst.cstn begins..."
-    bash code/contextual_embeddings/merger.sh spa por.rst.cstn spo
-    echo "merging spa and por.rst.cstn is done"
+if [ "$CONFIG" = "preprocess" ]; then
+    for dataset in ${datasets[*]}; do
+        echo "splitting "${dataset}" begins..."
+        # python code/ssplit/parse_corpus.py ${dataset} --parser stanza --out_dir data
+        echo "splitting "${dataset}" is done"
+    done
+    for group in ${groups[*]}; do IFS=","; set -- $group;
+        echo "merging "$1" and "$2" into "$3" begins..."
+        bash code/contextual_embeddings/merger.sh $1 $2 $3
+        echo "merging "$1" and "$2" into "$3" is done"
+    done
     exit
 fi
 
 if [ "$CONFIG" = "tok" ]; then
-    if [ "$DATASET" = "rus.rst.rrt" ] || [ "$DATASET" = "tur.pdtb.tdb" ]; then
-        bash code/contextual_embeddings/expes.sh ${DATASET} split.tok bert ${ACTION} -s 200
-    else
-        bash code/contextual_embeddings/expes.sh ${DATASET} split.tok bert ${ACTION}
-    fi
-elif [ "$DATASET" = "eng.pdtb.pdtb" ] || [ "$DATASET" = "tur.pdtb.tdb" ] || [ "$DATASET" = "zho.pdtb.cdtb" ] || [ "$DATASET" = "eng.rst.rstdt" ] || [ "$DATASET" = "eus.rst.ert" ] || [ "$DATASET" = "fas.rst.prstc" ] || [ "$DATASET" = "fra.sdrt.annodis" ] || [ "$DATASET" = "nld.rst.nldt" ] || [ "$DATASET" = "rus.rst.rrt" ] || [ "$DATASET" = "zho.rst.sctb" ]; then
-    bash code/contextual_embeddings/expes.sh ${DATASET} ${CONFIG} bert ${ACTION}
-elif [ "$DATASET" = "deu.rst.pcc"]; then # you don't have to merge two dataset many times or train a dataset many times. you can comment these parts after the first time.
-    bash code/contextual_embeddings/expes.sh ger conllu bert train
-    bash code/contextual_embeddings/expes.sh deu.rst.pcc conllu bert test ger
-elif [ "$DATASET" = "eng.rst.gum"]; then
-    bash code/contextual_embeddings/expes.sh eng conllu bert train
-    bash code/contextual_embeddings/expes.sh eng.rst.gum conllu bert test eng
-elif [ "$DATASET" = "eng.sdrt.stac"]; then
-    bash code/contextual_embeddings/expes.sh eng conllu bert train
-    bash code/contextual_embeddings/expes.sh eng.sdrt.stac conllu bert train eng
-elif [ "$DATASET" = "spa.rst.sctb"]; then
-    bash code/contextual_embeddings/expes.sh spo conllu bert train
-    bash code/contextual_embeddings/expes.sh spa.rst.sctb conllu bert test spo
-elif [ "$DATASET" = "spa.rst.rststb"]; then
-    bash code/contextual_embeddings/expes.sh spo conllu bert train
-    bash code/contextual_embeddings/expes.sh spa.rst.rststb conllu bert train spo
-elif [ "$DATASET" = "por.rst.cstn"]; then
-    bash code/contextual_embeddings/expes.sh spo conllu bert train
-    bash code/contextual_embeddings/expes.sh por.rst.cstn conllu bert train spo
+    for dataset in ${datasets[*]}; do
+        if [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "tur.pdtb.tdb" ]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert train -s 200
+        else
+            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert train
+        fi
+    done
+else    
+    for group in "eng" "ger" "spo"; do 
+        bash code/contextual_embeddings/expes.sh ${group} conllu bert train
+    done
+    for dataset in ${datasets[*]}; do
+        if [ "$dataset" = "eng.pdtb.pdtb" ] || [ "$dataset" = "tur.pdtb.tdb" ] || [ "$dataset" = "zho.pdtb.cdtb" ] || [ "$dataset" = "eng.rst.rstdt" ] || [ "$dataset" = "eus.rst.ert" ] || [ "$dataset" = "fas.rst.prstc" ] || [ "$dataset" = "fra.sdrt.annodis" ] || [ "$dataset" = "nld.rst.nldt" ] || [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "zho.rst.sctb" ]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test
+        elif [ "$dataset" = "deu.rst.pcc"]; then 
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test ger
+        elif [ "$dataset" = "eng.rst.gum"]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test eng
+        elif [ "$dataset" = "eng.sdrt.stac"]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train eng
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert testft eng
+        elif [ "$dataset" = "spa.rst.sctb"]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test spo
+        elif [ "$dataset" = "spa.rst.rststb"] || [ "$dataset" = "por.rst.cstn"]; then
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train spo
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert testft spo
+        fi
+    done
 fi
