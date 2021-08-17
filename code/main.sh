@@ -6,7 +6,7 @@ groups=("eng.rst.gum","eng.rst.rstdt","eng_rst" "eng_rst","eng.sdrt.stac","eng" 
 if [ "$CONFIG" = "preprocess" ]; then
     for dataset in ${datasets[*]}; do
         echo "splitting "${dataset}" begins..."
-        # python code/ssplit/parse_corpus.py ${dataset} --parser stanza --out_dir data
+        python code/ssplit/parse_corpus.py ${dataset} --parser stanza --out_dir data
         echo "splitting "${dataset}" is done"
     done
     for group in ${groups[*]}; do IFS=","; set -- $group;
