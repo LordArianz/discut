@@ -4,7 +4,7 @@ export OUTPUT=${3}
 
 echo "first=${FIRST}, second=${SECOND}, output=${OUTPUT}"
 
-export BASE="../../data/"
+export BASE="data/"
 export CONV="data_converted/"
 
 mkdir -p $BASE$OUTPUT
