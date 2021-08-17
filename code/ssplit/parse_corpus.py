@@ -22,10 +22,12 @@ if __name__ == '__main__':
     parser.add_argument('--parser', default='all', choices=('stanfordnlp', 'corenlp', 'stanza', 'all'), help='Selected parser')
     parser.add_argument('--processing', default='ssplit', choices=('ssplit', 'parsed'), help='Desired processing')
     parser.add_argument('--out_dir', default='.', help='Base dir for parser outputs')
+    parser.add_argument('--data_dir', default='data', help='Data directory')
+
     args = parser.parse_args()
     # locate corpus files
     corpus = args.corpus
-    corpus_dir = os.path.join(DATA_DIR, corpus)
+    corpus_dir = os.path.join(args.data_dir, corpus) # os.path.join(DATA_DIR, corpus)
     if not os.path.isdir(corpus_dir):
         raise ValueError("Incorrect path to corpus: {}".format(corpus_dir))
     sections = (('train', 'dev', 'test') if args.section == 'all'
