@@ -30,12 +30,9 @@ else
         bash code/contextual_embeddings/expes.sh ${group} conllu bert train
     done
     for dataset in ${datasets[*]}; do
-        if [ "$dataset" = "eng.pdtb.pdtb" ] || [ "$dataset" = "eng.rst.rstdt" ] || [ "$dataset" = "eus.rst.ert" ] || [ "$dataset" = "fas.rst.prstc" ] || [ "$dataset" = "fra.sdrt.annodis" ] || [ "$dataset" = "nld.rst.nldt" ] || [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "zho.rst.sctb" ]; then
+        if [ "$dataset" = "eng.pdtb.pdtb" ] || [ "$dataset" = "eng.rst.rstdt" ] || [ "$dataset" = "tur.pdtb.tdb" ] || [ "$dataset" = "zho.pdtb.cdtb" ] || [ "$dataset" = "eus.rst.ert" ] || [ "$dataset" = "fas.rst.prstc" ] || [ "$dataset" = "fra.sdrt.annodis" ] || [ "$dataset" = "nld.rst.nldt" ] || [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "zho.rst.sctb" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test
-        elif [ "$dataset" = "tur.pdtb.tdb" ] || [ "$dataset" = "zho.pdtb.cdtb" ]; then
-            bash code/contextual_embeddings/expes.sh ${dataset} conll bert train
-            bash code/contextual_embeddings/expes.sh ${dataset} conll bert test
         elif [ "$dataset" = "deu.rst.pcc"]; then 
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test ger
         elif [ "$dataset" = "eng.rst.gum"]; then
