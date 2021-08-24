@@ -20,9 +20,11 @@ fi
 if [ "$CONFIG" = "tok" ]; then
     for dataset in ${datasets[*]}; do
         if [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "tur.pdtb.tdb" ]; then
-            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert train -s 200
+            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert train --s 200
+            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert test --s 200
         else
             bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert train
+            bash code/contextual_embeddings/expes.sh ${dataset} split.tok bert test
         fi
     done
 else    
@@ -30,19 +32,25 @@ else
         bash code/contextual_embeddings/expes.sh ${group} conllu bert train
     done
     for dataset in ${datasets[*]}; do
-        if [ "$dataset" = "eng.pdtb.pdtb" ] || [ "$dataset" = "eng.rst.rstdt" ] || [ "$dataset" = "tur.pdtb.tdb" ] || [ "$dataset" = "zho.pdtb.cdtb" ] || [ "$dataset" = "eus.rst.ert" ] || [ "$dataset" = "fas.rst.prstc" ] || [ "$dataset" = "fra.sdrt.annodis" ] || [ "$dataset" = "nld.rst.nldt" ] || [ "$dataset" = "rus.rst.rrt" ] || [ "$dataset" = "zho.rst.sctb" ]; then
+        if [ "$dataset" = "eng.pdtb.pdtb" ] || [ "$dataset" = "eng.rst.rstdt" ] || [ "$dataset" = "zho.pdtb.cdtb" ] || [ "$dataset" = "eus.rst.ert" ] || [ "$dataset" = "fas.rst.prstc" ] || [ "$dataset" = "fra.sdrt.annodis" ] || [ "$dataset" = "nld.rst.nldt" ] || [ "$dataset" = "zho.rst.sctb" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test
-        elif [ "$dataset" = "deu.rst.pcc"]; then 
+        elif [ "$dataset" = "rus.rst.rrt" ]; then 
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train --s 100
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test --s 100
+        elif [ "$dataset" = "tur.pdtb.tdb" ]; then 
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train --s 200
+            bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test --s 200
+        elif [ "$dataset" = "deu.rst.pcc" ]; then 
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test ger
-        elif [ "$dataset" = "eng.rst.gum"]; then
+        elif [ "$dataset" = "eng.rst.gum" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test eng
-        elif [ "$dataset" = "eng.sdrt.stac"]; then
+        elif [ "$dataset" = "eng.sdrt.stac" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train eng
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert testft eng
-        elif [ "$dataset" = "spa.rst.sctb"]; then
+        elif [ "$dataset" = "spa.rst.sctb" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert test spo
-        elif [ "$dataset" = "spa.rst.rststb"] || [ "$dataset" = "por.rst.cstn"]; then
+        elif [ "$dataset" = "spa.rst.rststb" ] || [ "$dataset" = "por.rst.cstn" ]; then
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert train spo
             bash code/contextual_embeddings/expes.sh ${dataset} ${CONFIG} bert testft spo
         fi
